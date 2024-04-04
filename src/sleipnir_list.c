@@ -55,7 +55,6 @@ void spListDestroy(struct SpList *pList,
     pList->tail = NULL;
     pList->count = 0;
     pList->pAllocationCallbacks->pfnFree(pList);
-    pList = NULL;
 }
 
 void spListAdd(struct SpList *pList, void *data) {
@@ -63,11 +62,11 @@ void spListAdd(struct SpList *pList, void *data) {
     pNode->data = data;
     pNode->next = NULL;
 
-    if (pList->head == NULL) {
+    if (pList->head == NULL)
         pList->head = pNode;
-    } else {
+    else
         pList->tail->next = pNode;
-    }
+
     pList->tail = pNode;
     pList->count++;
 }
