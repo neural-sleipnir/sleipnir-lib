@@ -29,4 +29,9 @@ struct SpAllocationCallbacks {
     PFN_spFreeFunction pfnFree;
 };
 
+enum SpResult {
+    SP_SUCCESS,
+    SP_FAILURE,
+};
+
 #endif //SLEIPNIRLIB_SLEIPNIR_COMMON_H
