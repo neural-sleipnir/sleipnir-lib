@@ -32,7 +32,7 @@ static struct SpBumpAlloc bumpAllocator = {
         .size = sizeof(struct SpBumpAlloc)
 };
 
-void *bump_alloc(size_t size) {
+void *spBumpAlloc(size_t size) {
     assert(size != 0 || size < SLEIPNIR_BUMP_ALLOC_SIZE);
     size = SLEIPNIR_ALIGN_UP(size);
     assert(bumpAllocator.size >= size);

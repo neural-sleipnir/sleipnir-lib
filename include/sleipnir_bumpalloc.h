@@ -17,6 +17,6 @@
 
 #include <stddef.h>
 
-void *bump_alloc(size_t size);
+void *spBumpAlloc(size_t size);
 
 #endif //SLEIPNIRLIB_SLEIPNIR_BUMPALLOC_H
