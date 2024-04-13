@@ -105,3 +105,7 @@ bool spListRemoveNodeIf(struct SpList *pList,
 bool spListIsLastNode(struct SpList *pList, struct SpListNode *pNode) {
     return pList->tail == pNode;
 }
+
+size_t spListGetLength(struct SpList *pList) {
+    return pList->count;
+}

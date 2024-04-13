@@ -42,6 +42,8 @@ bool spListRemoveNodeIf(struct SpList *pList,
                         PFN_spListEqualityComparerFunction comparer,
                         struct SpListNode *pOtherNode);
 
-bool spListIsLastNode(struct SpList *list, struct SpListNode *pNode);
+bool spListIsLastNode(struct SpList *pList, struct SpListNode *pNode);
+
+size_t spListGetLength(struct SpList *pList);
 
 #endif // SLEIPNIR_LIB_SLEIPNIR_LIST_H
