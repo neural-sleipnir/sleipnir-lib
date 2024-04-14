@@ -35,4 +35,6 @@
 #define sp_atomic_inc_acq_rel(p) sp_atomic_add_acq_rel(p, (uintptr_t)1)
 #define sp_atomic_dec_acq_rel(p) sp_atomic_sub_acq_rel(p, (uintptr_t)1)
 
+#define sp_atomic_exchange_relaxed(p, x) sp_atomic_exchange_explicit(p, x, memory_order_relaxed)
+
 #endif //SLEIPNIRLIB_SLEIPNIR_ATOMIC_H
