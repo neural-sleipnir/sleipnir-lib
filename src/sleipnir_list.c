@@ -16,11 +16,17 @@
 
 #include <stddef.h>
 
+struct SpListIterator {
+    struct SpListNode *pCurrentNode;
+    size_t currentIndex;
+};
+
 struct SpList {
     struct SpAllocationCallbacks *pAllocationCallbacks;
-    struct SpListNode *head;
-    struct SpListNode *tail;
+    struct SpListNode *pHead;
+    struct SpListNode *pTail;
     size_t count;
+    struct SpListIterator *pIterator;
 };
 
 struct SpList *spListCreate(struct SpAllocationCallbacks *pAllocationCallbacks) {
@@ -28,10 +34,15 @@ struct SpList *spListCreate(struct SpAllocationCallbacks *pAllocationCallbacks) 
         return NULL;
 
     struct SpList *pList = pAllocationCallbacks->pfnAllocation(sizeof(struct SpList));
-    pList->head = NULL;
-    pList->tail = NULL;
+    pList->pHead = NULL;
+    pList->pTail = NULL;
     pList->count = 0;
     pList->pAllocationCallbacks = pAllocationCallbacks;
+
+    struct SpListIterator *pIterator = pAllocationCallbacks->pfnAllocation(sizeof(struct SpListIterator));
+    pIterator->pCurrentNode = NULL;
+    pIterator->currentIndex = -1;
+    pList->pIterator = pIterator;
 
     return pList;
 }
@@ -41,7 +52,7 @@ void spListDestroy(struct SpList *pList,
     if (pList == NULL)
         return;
 
-    struct SpListNode *pCurrent = pList->head;
+    struct SpListNode *pCurrent = pList->pHead;
     struct SpListNode *pTemp = NULL;
 
     while (pCurrent != NULL) {
@@ -51,9 +62,12 @@ void spListDestroy(struct SpList *pList,
         pfnUserDataDestroy(pTemp->data);
         pList->pAllocationCallbacks->pfnFree(pTemp);
     }
-    pList->head = NULL;
-    pList->tail = NULL;
+    pList->pHead = NULL;
+    pList->pTail = NULL;
     pList->count = 0;
+    pList->pIterator->pCurrentNode = NULL;
+    pList->pIterator->currentIndex = -1;
+    pList->pAllocationCallbacks->pfnFree(pList->pIterator);
     pList->pAllocationCallbacks->pfnFree(pList);
 }
 
@@ -62,19 +76,19 @@ void spListAdd(struct SpList *pList, void *data) {
     pNode->data = data;
     pNode->next = NULL;
 
-    if (pList->head == NULL)
-        pList->head = pNode;
+    if (pList->pHead == NULL)
+        pList->pHead = pNode;
     else
-        pList->tail->next = pNode;
+        pList->pTail->next = pNode;
 
-    pList->tail = pNode;
+    pList->pTail = pNode;
     pList->count++;
 }
 
 bool spListRemoveNodeIf(struct SpList *pList,
                         PFN_spListEqualityComparerFunction comparer,
                         struct SpListNode *pOtherNode) {
-    struct SpListNode *pCurrent = pList->head;
+    struct SpListNode *pCurrent = pList->pHead;
     struct SpListNode *pPrevious = NULL;
     struct SpListNode *pTemp = NULL;
 
@@ -88,11 +102,11 @@ bool spListRemoveNodeIf(struct SpList *pList,
         if (pPrevious != NULL) {
             pPrevious->next = pCurrent->next;
             if (spListIsLastNode(pList, pCurrent))
-                pList->tail = pPrevious;
+                pList->pTail = pPrevious;
         } else {
-            pList->head = pList->head->next;
-            if (pList->head == NULL)
-                pList->tail = NULL;
+            pList->pHead = pList->pHead->next;
+            if (pList->pHead == NULL)
+                pList->pTail = NULL;
         }
         pList->pAllocationCallbacks->pfnFree(pTemp);
         pList->count--;
@@ -102,10 +116,37 @@ bool spListRemoveNodeIf(struct SpList *pList,
     return false;
 }
 
+bool spListIsFirstNode(struct SpList *pList, struct SpListNode *pNode) {
+    return pList->pHead == pNode;
+}
+
 bool spListIsLastNode(struct SpList *pList, struct SpListNode *pNode) {
-    return pList->tail == pNode;
+    return pList->pTail == pNode;
 }
 
 size_t spListGetLength(struct SpList *pList) {
     return pList->count;
+}
+
+struct SpListNode *spListIteratorNext(struct SpList *pList) {
+    pList->pIterator->currentIndex++;
+
+    struct SpListNode *pCurrentNode = pList->pIterator->pCurrentNode;
+    if (pCurrentNode == NULL)
+        pList->pIterator->pCurrentNode = pList->pHead;
+    else
+        pList->pIterator->pCurrentNode = pCurrentNode->next;
+
+    return pList->pIterator->pCurrentNode;
+}
+
+void spListIteratorReset(struct SpList *pList) {
+    pList->pIterator->currentIndex = -1;
+    pList->pIterator->pCurrentNode = NULL;
+}
+
+struct SpListNode *spListBegin(struct SpList *pList) {
+    pList->pIterator->currentIndex = 0;
+    pList->pIterator->pCurrentNode = pList->pHead;
+    return pList->pHead;
 }

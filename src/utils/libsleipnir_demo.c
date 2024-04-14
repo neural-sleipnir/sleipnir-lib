@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "sleipnir_list.h"
 
@@ -64,6 +65,12 @@ int main() {
     node.data = &otherData;
     node.next = NULL;
     spListRemoveNodeIf(pList, compareNodes, &node);
+
+    struct SpListNode *pos = NULL;
+    SP_LIST_FOREACH(pos, pList) {
+        struct MyData *data = (struct MyData *) pos->data;
+        printf("%d\n", data->value);
+    }
 
     spListDestroy(pList, destroyUserData);
 

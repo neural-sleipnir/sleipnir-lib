@@ -36,6 +36,10 @@ struct SpList *spListCreate(struct SpAllocationCallbacks *pAllocationCallbacks);
 void spListDestroy(struct SpList *pList,
                    PFN_spListDestroyFreeUserDataFunction pfnUserDataDestroy);
 
+struct SpListNode *spListBegin(struct SpList *pList);
+
+bool spListIsFirstNode(struct SpList *pList, struct SpListNode *pNode);
+
 void spListAdd(struct SpList *pList, void *data);
 
 bool spListRemoveNodeIf(struct SpList *pList,
@@ -45,5 +49,14 @@ bool spListRemoveNodeIf(struct SpList *pList,
 bool spListIsLastNode(struct SpList *pList, struct SpListNode *pNode);
 
 size_t spListGetLength(struct SpList *pList);
+
+void spListIteratorReset(struct SpList *pList);
+
+struct SpListNode *spListIteratorNext(struct SpList *pList);
+
+bool spListIteratorEnd(struct SpList *pList);
+
+#define SP_LIST_FOREACH(pos, list) \
+    for (pos = spListBegin((list)); pos != NULL; pos = spListIteratorNext((list)))
 
 #endif // SLEIPNIR_LIB_SLEIPNIR_LIST_H
