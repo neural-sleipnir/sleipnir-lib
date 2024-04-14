@@ -16,6 +16,7 @@
 #define SLEIPNIRLIB_SLEIPNIR_ATOMIC_H
 
 #include <stdatomic.h>
+#include <stdint.h>
 
 #define sp_atomic_add_relaxed(p, x) \
   atomic_fetch_add_explicit(p, x, memory_order_relaxed)
